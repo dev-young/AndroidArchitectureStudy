@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">AndroidArchitectureStudy</string>
+    <string name="header_text">\'%s\' Users</string>
+    <string name="msg_fail_to_load">로딩에 실패했습니다. 다시 시도해주세요.</string>
+    <string name="msg_fail_to_laod_user_detail">유저 정보 획득 실패</string>
+    <string name="str_only_like">좋아요만</string>
+    <string name="str_see_all">전체보기</string>
+</resources>
