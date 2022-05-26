@@ -6,10 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.devy.architecture_study.R
+import io.github.devy.architecture_study.domain.bus.LikeEventBus
 import io.github.devy.architecture_study.domain.model.User
 import io.github.devy.architecture_study.domain.usecase.GetCurrentUsersUseCase
 import io.github.devy.architecture_study.domain.usecase.GetUsersUseCase
-import io.github.devy.architecture_study.domain.usecase.ObserveLikeUserChangedUseCase
 import io.github.devy.architecture_study.domain.usecase.UpdateLikeUserUseCase
 import io.github.devy.architecture_study.presentation.SingleLiveEvent
 import io.github.devy.architecture_study.toLiveData
@@ -23,7 +23,7 @@ class UserListViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase,
     private val getCurrentUsersUseCase: GetCurrentUsersUseCase,
     private val updateLikeUserUseCase: UpdateLikeUserUseCase,
-    private val likeUserChangedUseCase: ObserveLikeUserChangedUseCase,
+    private val userLikeEventBus: LikeEventBus
 ) : AndroidViewModel(application) {
     private val res = application.resources
     private val _uiState = MutableLiveData<UiState>()
@@ -36,7 +36,7 @@ class UserListViewModel @Inject constructor(
         loadUserList()
 
         viewModelScope.launch {
-            likeUserChangedUseCase().collectLatest { (id, _) ->
+            userLikeEventBus.events.collectLatest { (id, _) ->
                 _uiEvent.value = UiEvent.LikeStateChanged(id)
             }
         }

@@ -7,7 +7,10 @@ import dagger.hilt.components.SingletonComponent
 import io.github.devy.architecture_study.domain.bus.LikeEventBus
 import io.github.devy.architecture_study.domain.bus.LikeEventBusImpl
 import io.github.devy.architecture_study.domain.repositoty.UserRepository
-import io.github.devy.architecture_study.domain.usecase.*
+import io.github.devy.architecture_study.domain.usecase.GetCurrentUsersUseCase
+import io.github.devy.architecture_study.domain.usecase.GetUserUseCase
+import io.github.devy.architecture_study.domain.usecase.GetUsersUseCase
+import io.github.devy.architecture_study.domain.usecase.UpdateLikeUserUseCase
 import javax.inject.Singleton
 
 @Module
@@ -46,11 +49,4 @@ object DomainModule {
     ): UpdateLikeUserUseCase {
         return UpdateLikeUserUseCase(repo, bus)
     }
-
-    @Provides
-    @Singleton
-    fun provideObserveLikeUserChangedUseCase(bus: LikeEventBus): ObserveLikeUserChangedUseCase {
-        return ObserveLikeUserChangedUseCase(bus)
-    }
-
 }
