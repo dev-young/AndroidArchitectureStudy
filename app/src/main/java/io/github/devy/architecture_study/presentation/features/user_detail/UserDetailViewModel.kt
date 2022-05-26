@@ -7,7 +7,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.devy.architecture_study.R
 import io.github.devy.architecture_study.domain.model.User
-import io.github.devy.architecture_study.domain.repositoty.UserRepository
+import io.github.devy.architecture_study.domain.usecase.GetUserUseCase
+import io.github.devy.architecture_study.domain.usecase.UpdateLikeUserUseCase
 import io.github.devy.architecture_study.presentation.SingleLiveEvent
 import io.github.devy.architecture_study.toLiveData
 import kotlinx.coroutines.launch
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class UserDetailViewModel @Inject constructor(
     application: Application,
-    private val repo: UserRepository,
+    private val getUserUseCase: GetUserUseCase,
+    private val updateLikeUserUseCase: UpdateLikeUserUseCase
 ) : AndroidViewModel(application) {
 
     private val res = application.resources
@@ -31,7 +33,7 @@ class UserDetailViewModel @Inject constructor(
     fun loadUser(id: Int) {
         viewModelScope.launch {
             userId = id
-            repo.getUserFromCache(id)?.let {
+            getUserUseCase(id)?.let {
                 _uiState.value = UiState(it)
             } ?: kotlin.run {
                 _uiEvent.value = UiEvent.Toast(res.getString(R.string.msg_fail_to_laod_user_detail))
@@ -42,7 +44,7 @@ class UserDetailViewModel @Inject constructor(
     fun toggleLike() {
         viewModelScope.launch {
             val user = uiState.value!!.user
-            if (repo.updateLike(userId, !user.like)) {
+            if (updateLikeUserUseCase(userId, !user.like)) {
                 user.like = !user.like
                 _uiState.value = UiState(user)
             }

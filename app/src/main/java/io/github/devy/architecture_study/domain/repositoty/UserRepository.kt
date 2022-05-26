@@ -1,7 +1,6 @@
 package io.github.devy.architecture_study.domain.repositoty
 
 import io.github.devy.architecture_study.domain.model.User
-import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
 
@@ -15,9 +14,4 @@ interface UserRepository {
     fun getUserFromCache(userId: Int): User?
 
     fun getUsersFromCache(onlyLike: Boolean): List<User>
-
-    /**
-     * 좋아요 상태가 변경 이벤트 Observe
-     * */
-    fun getLikeChangeEvent(): Flow<Pair<Int, Boolean>>
 }

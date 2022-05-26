@@ -7,7 +7,10 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.github.devy.architecture_study.R
 import io.github.devy.architecture_study.domain.model.User
-import io.github.devy.architecture_study.domain.repositoty.UserRepository
+import io.github.devy.architecture_study.domain.usecase.GetCurrentUsersUseCase
+import io.github.devy.architecture_study.domain.usecase.GetUsersUseCase
+import io.github.devy.architecture_study.domain.usecase.ObserveLikeUserChangedUseCase
+import io.github.devy.architecture_study.domain.usecase.UpdateLikeUserUseCase
 import io.github.devy.architecture_study.presentation.SingleLiveEvent
 import io.github.devy.architecture_study.toLiveData
 import kotlinx.coroutines.flow.collectLatest
@@ -17,7 +20,10 @@ import javax.inject.Inject
 @HiltViewModel
 class UserListViewModel @Inject constructor(
     application: Application,
-    private val repo: UserRepository,
+    private val getUsersUseCase: GetUsersUseCase,
+    private val getCurrentUsersUseCase: GetCurrentUsersUseCase,
+    private val updateLikeUserUseCase: UpdateLikeUserUseCase,
+    private val likeUserChangedUseCase: ObserveLikeUserChangedUseCase,
 ) : AndroidViewModel(application) {
     private val res = application.resources
     private val _uiState = MutableLiveData<UiState>()
@@ -30,7 +36,7 @@ class UserListViewModel @Inject constructor(
         loadUserList()
 
         viewModelScope.launch {
-            repo.getLikeChangeEvent().collectLatest { (id, _) ->
+            likeUserChangedUseCase().collectLatest { (id, _) ->
                 _uiEvent.value = UiEvent.LikeStateChanged(id)
             }
         }
@@ -39,7 +45,7 @@ class UserListViewModel @Inject constructor(
     fun loadUserList(query: String = "devy") {
         viewModelScope.launch {
             _uiState.value = UiState(loading = true)
-            kotlin.runCatching { repo.getUsers(query) }.onSuccess {
+            kotlin.runCatching { getUsersUseCase(query) }.onSuccess {
                 _uiState.value = UiState(header = query, userList = it)
             }.onFailure {
                 _uiState.value = uiState.value!!.copy(loading = false)
@@ -50,7 +56,7 @@ class UserListViewModel @Inject constructor(
 
     fun toggleLike(user: User) {
         viewModelScope.launch {
-            if (repo.updateLike(user.id, !user.like)) {
+            if (updateLikeUserUseCase(user.id, !user.like)) {
                 user.like = !user.like
                 _uiEvent.value = UiEvent.LikeStateChanged(user.id)
             }
@@ -62,7 +68,8 @@ class UserListViewModel @Inject constructor(
         _uiState.value = uiState.value!!.copy(
             loading = false,
             onlyLike = onlyLike,
-            userList = repo.getUsersFromCache(onlyLike))
+            userList = getCurrentUsersUseCase(onlyLike)
+        )
     }
 
 
