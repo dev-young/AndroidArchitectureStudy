@@ -1,24 +1,23 @@
 package io.github.devy.architecture_study.data.repository
 
-import io.github.devy.architecture_study.data.api.GitHubApi
-import io.github.devy.architecture_study.data.db.GithubUserDao
-import io.github.devy.architecture_study.data.model.LikeUserEntity
 import io.github.devy.architecture_study.data.model.toUser
+import io.github.devy.architecture_study.data.repository.local.UserRemoteDataSource
+import io.github.devy.architecture_study.data.repository.remote.UserLocalDataSource
 import io.github.devy.architecture_study.domain.model.User
 import io.github.devy.architecture_study.domain.repositoty.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class UserRepositoryImpl(
-    private val api: GitHubApi,
-    private val userDao: GithubUserDao,
+    private val localDataSource: UserLocalDataSource,
+    private val remoteDataSource: UserRemoteDataSource
 ) : UserRepository {
 
     private val userCache = linkedMapOf<Int, User>()
 
     override suspend fun getUsers(query: String): List<User> = withContext(Dispatchers.IO) {
-        val likeUserSet = userDao.getLikeUsers().map { it.userId }.toSet()
-        api.getUserListRes(query).let { it.list.map { it.toUser(likeUserSet.contains(it.id)) } }
+        val likeUserSet = localDataSource.getLikeUsers()
+        remoteDataSource.getUsers(query).map { it.toUser(likeUserSet.contains(it.id)) }
             .apply {
                 userCache.clear()
                 forEach { userCache[it.id] = it }
@@ -26,8 +25,8 @@ class UserRepositoryImpl(
     }
 
     override suspend fun updateLike(userId: Int, like: Boolean): Boolean {
-        return if (like) userDao.insertLikeUser(LikeUserEntity(userId)) > -1
-        else userDao.deleteLikeUser(userId) > 0
+        return if (like) localDataSource.insertLikeUser(userId)
+        else localDataSource.deleteLikeUser(userId)
     }
 
     override fun getUserFromCache(userId: Int) = userCache[userId]
