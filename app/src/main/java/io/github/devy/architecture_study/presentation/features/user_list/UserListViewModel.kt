@@ -9,9 +9,9 @@ import io.github.devy.architecture_study.R
 import io.github.devy.architecture_study.domain.model.User
 import io.github.devy.architecture_study.domain.usecase.GetCurrentUsersUseCase
 import io.github.devy.architecture_study.domain.usecase.GetUsersUseCase
-import io.github.devy.architecture_study.domain.usecase.ObserveLikeUserChangedUseCase
 import io.github.devy.architecture_study.domain.usecase.UpdateLikeUserUseCase
 import io.github.devy.architecture_study.presentation.SingleLiveEvent
+import io.github.devy.architecture_study.presentation.bus.LikeEventBus
 import io.github.devy.architecture_study.toLiveData
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -23,7 +23,7 @@ class UserListViewModel @Inject constructor(
     private val getUsersUseCase: GetUsersUseCase,
     private val getCurrentUsersUseCase: GetCurrentUsersUseCase,
     private val updateLikeUserUseCase: UpdateLikeUserUseCase,
-    private val likeUserChangedUseCase: ObserveLikeUserChangedUseCase,
+    private val likeUserChangedBus: LikeEventBus,
 ) : AndroidViewModel(application) {
     private val res = application.resources
     private val _uiState = MutableLiveData<UiState>()
@@ -36,7 +36,7 @@ class UserListViewModel @Inject constructor(
         loadUserList()
 
         viewModelScope.launch {
-            likeUserChangedUseCase().collectLatest { (id, _) ->
+            likeUserChangedBus.events.collectLatest { (id, _) ->
                 _uiEvent.value = UiEvent.LikeStateChanged(id)
             }
         }

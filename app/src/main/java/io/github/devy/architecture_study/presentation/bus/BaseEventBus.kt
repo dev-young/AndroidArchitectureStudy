@@ -1,4 +1,4 @@
-package io.github.devy.architecture_study.domain.bus
+package io.github.devy.architecture_study.presentation.bus
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

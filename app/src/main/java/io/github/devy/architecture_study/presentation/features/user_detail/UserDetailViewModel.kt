@@ -10,6 +10,7 @@ import io.github.devy.architecture_study.domain.model.User
 import io.github.devy.architecture_study.domain.usecase.GetUserUseCase
 import io.github.devy.architecture_study.domain.usecase.UpdateLikeUserUseCase
 import io.github.devy.architecture_study.presentation.SingleLiveEvent
+import io.github.devy.architecture_study.presentation.bus.LikeEventBus
 import io.github.devy.architecture_study.toLiveData
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,8 +19,9 @@ import javax.inject.Inject
 class UserDetailViewModel @Inject constructor(
     application: Application,
     private val getUserUseCase: GetUserUseCase,
-    private val updateLikeUserUseCase: UpdateLikeUserUseCase
-) : AndroidViewModel(application) {
+    private val updateLikeUserUseCase: UpdateLikeUserUseCase,
+    private val likeUserChangedBus: LikeEventBus
+    ) : AndroidViewModel(application) {
 
     private val res = application.resources
 
@@ -47,6 +49,7 @@ class UserDetailViewModel @Inject constructor(
             if (updateLikeUserUseCase(userId, !user.like)) {
                 user.like = !user.like
                 _uiState.value = UiState(user)
+                likeUserChangedBus.produceEvent(user.id, user.like)
             }
         }
     }
