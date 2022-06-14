@@ -1,11 +1,9 @@
-package io.github.devy.architecture_study.di
+package io.github.devy.architecture_study.domain.di
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.github.devy.architecture_study.presentation.bus.LikeEventBus
-import io.github.devy.architecture_study.presentation.bus.LikeEventBusImpl
 import io.github.devy.architecture_study.domain.repositoty.UserRepository
 import io.github.devy.architecture_study.domain.usecase.*
 import javax.inject.Singleton
