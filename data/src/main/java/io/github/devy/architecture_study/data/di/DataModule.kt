@@ -1,4 +1,4 @@
-package io.github.devy.architecture_study.di
+package io.github.devy.architecture_study.data.di
 
 import android.app.Application
 import androidx.room.Room
