@@ -1,4 +1,4 @@
-package io.github.devy.architecture_study.di
+package io.github.devy.architecture_study.presentation.di
 
 import dagger.Module
 import dagger.Provides

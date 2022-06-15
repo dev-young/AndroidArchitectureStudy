@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "AndroidArchitectureStudy"
-include ':app'
+include ':presentation'
 include ':domain'
 include ':data'
